@@ -1,0 +1,34 @@
+name: Build YD-RP2040 16MB MicroPython
+
+on:
+  workflow_dispatch:   # 手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MicroPython
+        uses: actions/checkout@v4
+        with:
+          ref: v1.29.0   # 想编译其他版本就改这里，比如 master
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake git pkg-config \
+            gcc-arm-none-eabi binutils-arm-none-eabi \
+            libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
+            python3
+
+      - name: Build firmware
+        working-directory: ports/rp2
+        run: |
+          make BOARD=VCC_GND_YD_RP2040 BOARD_VARIANT=flash_16mb submodules
+          make BOARD=VCC_GND_YD_RP2040 BOARD_VARIANT=flash_16mb -j$(nproc)
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: YD-RP2040-16MB-firmware
+          path: ports/rp2/build-VCC_GND_YD_RP2040-flash_16mb/firmware.uf2
