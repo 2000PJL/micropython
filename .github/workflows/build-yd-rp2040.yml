@@ -10,7 +10,7 @@ jobs:
       - name: Checkout MicroPython
         uses: actions/checkout@v4
         with:
-          ref: v1.29.0   # 想编译其他版本就改这里，比如 master
+          ref: v1.29.0-yd   # 想编译其他版本就改这里，比如 master
 
       - name: Install dependencies
         run: |
