@@ -1,7 +1,7 @@
 name: Cherry-pick YD-RP2040 support
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
 
 jobs:
   cherry-pick:
@@ -10,22 +10,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # 获取完整历史，以便访问 79b0c67
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Add upstream and fetch
-        run: |
-          git remote add upstream https://github.com/micropython/micropython.git || true
-          git fetch upstream
-
-      - name: Create branch and cherry-pick
+      - name: Download patch and apply
         run: |
           git checkout -b yd-rp2040
-          git cherry-pick 79b0c67
+          curl -sL https://github.com/micropython/micropython/commit/79b0c67.patch -o /tmp/yd-rp2040.patch
+          git am --3way /tmp/yd-rp2040.patch || {
+            echo "git am failed, trying git apply --3way"
+            git am --abort || true
+            git apply --3way /tmp/yd-rp2040.patch
+            git add -A
+            git commit -m "Add YD-RP2040 board support (based on 79b0c67)"
+          }
 
       - name: Push branch
         run: |
