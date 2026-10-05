@@ -6,7 +6,7 @@ list(APPEND PICO_BOARD_HEADER_DIRS ${MICROPY_BOARD_DIR})
 
 # Freeze board.py
 set(MICROPY_FROZEN_MANIFEST ${MICROPY_BOARD_DIR}/manifest.py)
-
+set(PICO_FLASH_SIZE_BYTES 16777216) 
 # Select the 8MB variant as the default
 set(PICO_BOARD "ydrp2040_flash_8mb")
 
