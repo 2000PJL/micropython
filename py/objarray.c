@@ -96,14 +96,14 @@ static void array_print(const mp_print_t *print, mp_obj_t o_in, mp_print_kind_t 
 #if MICROPY_PY_BUILTINS_BYTEARRAY || MICROPY_PY_ARRAY
 static mp_obj_array_t *array_new(char typecode, size_t n) {
     int typecode_size = mp_binary_get_size('@', typecode, NULL);
-    mp_obj_array_t *o = m_new_obj(mp_obj_array_t);
     #if MICROPY_PY_BUILTINS_BYTEARRAY && MICROPY_PY_ARRAY
-    o->base.type = (typecode == BYTEARRAY_TYPECODE) ? &mp_type_bytearray : &mp_type_array;
+    const mp_obj_type_t *type = (typecode == BYTEARRAY_TYPECODE) ? &mp_type_bytearray : &mp_type_array;
     #elif MICROPY_PY_BUILTINS_BYTEARRAY
-    o->base.type = &mp_type_bytearray;
+    const mp_obj_type_t *type = &mp_type_bytearray;
     #else
-    o->base.type = &mp_type_array;
+    const mp_obj_type_t *type = &mp_type_array;
     #endif
+    mp_obj_array_t *o = mp_obj_malloc(mp_obj_array_t, type);
     o->typecode = typecode;
     o->free = 0;
     o->len = n;
@@ -537,8 +537,10 @@ static mp_obj_t array_subscr(mp_obj_t self_in, mp_obj_t index_in, mp_obj_t value
                     mp_seq_clear(dest_items, o->len + len_adj, o->len, item_sz);
                     // TODO: alloc policy after shrinking
                 }
-                o->free -= len_adj;
-                o->len += len_adj;
+                if (len_adj != 0) {
+                    o->free -= len_adj;
+                    o->len += len_adj;
+                }
                 return mp_const_none;
                 #else
                 return MP_OBJ_NULL; // op not supported

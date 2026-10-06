@@ -52,8 +52,8 @@ manage the ESP32 microcontroller, as well as a way to manage the required
 build environment and toolchains needed to build the firmware.
 
 The ESP-IDF changes quickly and MicroPython only supports certain versions. The
-current recommended version of ESP-IDF for MicroPython is v5.5.2. MicroPython
-also supports v5.3, v5.4, v5.4.1, v5.4.2, v5.5.1 and v5.5.4.
+current recommended version of ESP-IDF for MicroPython is v5.5.5. MicroPython
+also supports v5.3, v5.4, v5.4.1, v5.4.2, v5.5.1, v5.5.2 and v5.5.4.
 
 <!-- Important: If updating the above, please also update:
      * IDF_OLDEST_VER & IDF_NEWEST_VER in .github/workflows/port_esp32.yml
@@ -69,6 +69,17 @@ Linux](https://msdn.microsoft.com/en-au/commandline/wsl/install_guide) is the
 most efficient way to install the ESP32 toolchain and build the project. If
 you use WSL then follow the Linux instructions rather than the Windows
 instructions.
+
+To obtain the toolchain and set up your environment, the Espressif instructions
+will guide you to either use the `install.sh` (or `install.bat` if you're on
+Windows) script, or to use their Espressif Installation Manager (EIM) - a more
+user-friendly tool for installation and setup tasks.
+
+For more information on how to install and operate the EIM tool, visit [the
+official EIM site](https://docs.espressif.com/projects/idf-im-ui/en/latest/).
+
+Installation via the install script
+-----------------------------------
 
 The Espressif instructions will guide you through using the `install.sh`
 (or `install.bat`) script to download the toolchain and set up your environment.
@@ -108,6 +119,77 @@ install for multiple chips. Or omit the chip to install for all Espressif
 chips (which is slower).
 
 You will need to source `export.sh` for every new session.
+
+Installation via Espressif Installation Manager (EIM) tool
+----------------------------------------------------------
+
+> [!WARNING]
+> EIM support is still somewhat experimental, as we've added a workaround for
+> some shortcomings in the tool's expectations for its own usage scenarios. Be
+> on the lookout for issues when building MicroPython with this method.
+
+This method was found to work with EIM versions 0.18.0 and 0.19.0 (the latest at
+the moment).
+
+For an environment you can build MicroPython from, the default settings proposed
+by EIM when installing a new SDK will work without changes, as long as you are
+installing one of the supported SDK versions.
+
+If you run the EIM installation wizard, you can either accept the default
+settings or for a smaller, working installation you can follow these suggestions
+for the target platforms and optional components selection.  Text was taken from
+the command line version of the tool, but the prompts should apply to the GUI
+version as well.
+
+> [!NOTE]
+> These are all the chips currently supported by MicroPython.  If you only plan
+> to build MicroPython for a subset of these, you can select the ones you want
+> from this list.
+
+```
+Please select all of the target platforms (ESP chips)
+
+⬚ all
+✔ esp32
+✔ esp32c2
+✔ esp32c3
+✔ esp32c5
+✔ esp32c6
+⬚ esp32c61
+✔ esp32h2
+✔ esp32p4
+✔ esp32s2
+✔ esp32s3
+⬚ esp32s31
+```
+
+```
+Select ESP-IDF features to install
+
+✔ core - Core packages necessary for ESP-IDF
+⬚ gdbgui - Packages for supporting debugging from web browser
+⬚ pytest - Packages for CI with pytest
+⬚ ci - Packages for ESP-IDF CI scripts
+⬚ docs - Packages for building ESP-IDF documentation
+```
+
+> [!NOTE]
+> If you are not sure whether you have CMake installed or if the version of
+> CMake present on your system is compatible with this, leave the `cmake` entry
+> checked.
+
+```
+Select additional tools to install
+
+✔ cmake - CMake build system
+⬚ qemu-xtensa - QEMU for Xtensa
+⬚ qemu-riscv32 - QEMU for RISC-V
+```
+
+Once you've activated your chosen environment as mentioned in the EIM
+documentation, you can just use the commands described in the next section: the
+build scripts will figure out whether an EIM environment is active, and pick
+things up from there.
 
 Building the firmware
 ---------------------
